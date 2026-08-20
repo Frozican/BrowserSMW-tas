@@ -1,17 +1,93 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BrowserSMW‑TAS</title>
+
   <style>
     body {
       background: #111;
       color: #eee;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100vh;
       margin: 0;
+      gap: 1rem;
+      font-family: monospace;
     }
+
     canvas {
+      border: 2px solid #444;
+      image-rendering: pixelated;
+    }
+
+    input[type="file"] {
+      background: #222;
+      color: #eee;
+      border: 1px solid #555;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    input[type="file"]:hover {
+      background: #333;
+    }
+
+    #statusBox {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      text-align: center;
+    }
+
+    .status {
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      background: #222;
+      border: 1px solid #555;
+      width: 140px;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="canvas" width="256" height="224"></canvas>
+
+  <input type="file" id="romInput" accept=".smc,.sfc" />
+
+  <div id="statusBox">
+    <div id="romStatus" class="status">ROM not loaded</div>
+    <div id="frameStatus" class="status">Frame not running</div>
+  </div>
+
+  <script type="module">
+    import { loadROM } from "./main.js";
+
+    const romStatus = document.getElementById("romStatus");
+    const frameStatus = document.getElementById("frameStatus");
+
+    // Update frame status once the loop starts
+    frameStatus.textContent = "Frame running";
+
+    // ROM upload handler
+    document.getElementById("romInput").addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const result = await loadROM(file);
+
+      if (result === 1) {
+        romStatus.textContent = "ROM loaded";
+      } else {
+        romStatus.textContent = "ROM load failed";
+      }
+    });
+  </script>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
